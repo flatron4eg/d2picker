@@ -2,8 +2,9 @@
 <html>
     <head>
         <style>
-            body {background:#333; font-family: Calibri}
-            #container {width:80%; margin:100px auto 0}
+            * {font-family: Calibri}
+            body {background:#333; }
+            #container {width:80%;margin: 0 auto}
             .heroes {display:inline-block; vertical-align: top; box-sizing:border-box; padding:0 10px;}
             .hero, .item {display:inline-block; margin:5px; width:100px; height:50px; background-size: cover; background-position:center center; cursor: pointer}
             .item {width:100px; height:70px;}
@@ -11,16 +12,18 @@
             .hero:hover {filter: grayscale(50%);}
             .hero.disabled {filter: grayscale(100%);}
             .hero.found {position:relative; z-index:2; margin-left: -24px; margin-right:-14px; width:140px; height:90px; margin-bottom:-14px; margin-top:-24px;border:4px solid #ddd}
-            .toggle, .generate, .remove {display:block; cursor: pointer; width:100%; margin:10px 0; background:#444; color:#fff; border:0; font-size:20px; padding:10px 12px; outline: none !important}
+            .toggle, .generate, .remove {font-weight: bold; display:block; cursor: pointer; width:100%; margin:10px 0; background:#444; color:#fff; border:0; font-size:20px; padding:10px 12px; outline: none !important}
             .remove {float:right; width: auto;}
             .toggle:hover, .generate:hover {background:#555}
             .build>* {vertical-align: middle}
+            #tip {padding: 40px; color:#777; text-align:center; font-weight: bold}
             #search {position: fixed; bottom: 100px; text-shadow: 2px 2px 5px rgba(0,0,0,0.3); font-size: 48px; width:100%; text-align:center; left:0; display:none; color:#fff; font-weight: bold; text-transform: uppercase}
         </style>
         <script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
         <title>Dota 2 Random Hero Build Generator</title>
     </head>
     <body>
+        <div id="tip">To search the hero, start typing hero's name</div>
         <div id="container"></div>
         <div id="search"></div>
         <script>
