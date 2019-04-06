@@ -59,7 +59,6 @@
 
                 isItemBoots (itemkey) {
                     const item = this.items.find(item => item.key === itemkey);
-                    console.log(itemkey);
                     return item
                         && item.components
                         && (
@@ -124,6 +123,7 @@
                         .filter(item => 
                             !this.isItemBoots(item.key)
                             && item.cost >= 2000
+                            && ["rare","epic","artifact"].includes(item.qual)
                         )
                         .shuffle()
                         .slice(0, 5);
