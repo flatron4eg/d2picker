@@ -45,7 +45,6 @@
                 constructor (heroes, items) {
                     this.heroes = heroes;
                     this.items = items;
-                    this.boots = ["travel_boots","phase_boots","power_treads","arcane_boots","guardian_greaves","tranquil_boots"];
                     this.searchString = "";
                 }
 
@@ -56,6 +55,17 @@
                 getItemImage (itemkey) {
                     const item = this.items.find(item => item.key === itemkey);
                     return `http://cdn.dota2.com/apps/dota2/images/items/${item.img}`;
+                }
+
+                isItemBoots (itemkey) {
+                    const item = this.items.find(item => item.key === itemkey);
+                    console.log(itemkey);
+                    return item
+                        && item.components
+                        && (
+                            item.components.includes("boots")
+                            || item.components.some(component => this.isItemBoots(component))
+                        );
                 }
 
                 updateSearch (event, data) {
@@ -107,13 +117,12 @@
                     const activeHeroes = this.heroes.filter(hero => hero.isActive);
                     let randomNum = this.getRandomNum(activeHeroes.length);
                     const hero = activeHeroes[randomNum];
-                    randomNum = this.getRandomNum(this.boots.length);
-                    const boots = this.items
-                        .filter(item => this.boots.includes(item.key))
-                        [randomNum];
+                    const allBootsItems = this.items.filter(item => this.isItemBoots(item.key));
+                    randomNum = this.getRandomNum(allBootsItems.length);
+                    const boots = allBootsItems[randomNum];
                     const otherItems = this.items
                         .filter(item => 
-                            !this.boots.includes(item.key)
+                            !this.isItemBoots(item.key)
                             && item.cost >= 2000
                         )
                         .shuffle()
