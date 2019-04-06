@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <style>
+            body {background:#333}
+            #container {width:80%; margin:100px auto}
+            .heroes {display:inline-block; vertical-align: top; box-sizing:border-box; padding:0 10px;}
+            .hero, .item {display:inline-block; margin:5px; width:100px; height:50px; background-size: cover; background-position:center center; cursor: pointer}
+            .item {width:100px; height:70px;}
+            .items {display:inline-block; margin-left:100px}
+            .hero:hover {filter: grayscale(50%);}
+            .hero.disabled {filter: grayscale(100%);}
+            .toggle, .generate, .remove {display:block; cursor: pointer; width:100%; margin:10px 0; background:#444; color:#fff; border:0; font-size:20px; padding:10px 12px; outline: none !important}
+            .remove {float:right; width: auto;}
+            .toggle:hover, .generate:hover {background:#555}
+            .build>* {vertical-align: middle}
+        </style>
+        <script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
+    </head>
+    <body>
+        <div id="container"></div>
+        <script>
+            Array.prototype.shuffle = function () {
+                for (let i = this.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [this[i], this[j]] = [this[j], this[i]];
+                }
+                return this;
+            };
+
+            const HeroAttribute = Object.freeze({
+                STRENGTH: "str",
+                AGILITY: "agi",
+                INTELIGENCE: "int"
+            });
+
+            class HeroPicker {
+                constructor (heroes, items) {
+                    this.heroes = heroes;
+                    this.items = items;
+                    this.boots = ["travel_boots","phase_boots","power_treads","arcane_boots","guardian_greaves","tranquil_boots"];
+                }
+
+                getHeroImage (heroname) {
+                    return `http://cdn.dota2.com/apps/dota2/images/heroes/${heroname}_hphover.png`;
+                }
+
+                getItemImage (itemkey) {
+                    const item = this.items.find(item => item.key === itemkey);
+                    return `http://cdn.dota2.com/apps/dota2/images/items/${item.img}`;
+                }
+
+                toggleAttributeHeroes (attribute) {
+                    this.heroes
+                        .filter(hero => hero.pa === HeroAttribute[attribute])
+                        .forEach(hero => {
+                            this.toggleHero(hero.key);
+                        });
+                }
+
+                toggleHero (heroname) {
+                    const hero = this.heroes.find(hero => hero.key === heroname);
+                    hero.isActive = !hero.isActive;
+                    $(`.heroes .hero#${heroname}`).toggleClass("disabled");
+                }
+
+                getRandomNum (size) {
+                    return parseInt(Math.random() * size);
+                }
+
+                generateBuild () {
+                    const activeHeroes = this.heroes.filter(hero => hero.isActive);
+                    let randomNum = this.getRandomNum(activeHeroes.length);
+                    const hero = activeHeroes[randomNum];
+                    randomNum = this.getRandomNum(this.boots.length);
+                    const boots = this.items
+                        .filter(item => this.boots.includes(item.key))
+                        [randomNum];
+                    const otherItems = this.items
+                        .filter(item => 
+                            !this.boots.includes(item.key)
+                            && item.cost >= 2000
+                        )
+                        .shuffle()
+                        .slice(0, 5);
+                    return { hero, items: [ boots, ...otherItems ] };
+                }
+
+                renderBuild (build) {
+                    const heroContainer = $(`<div class="hero" title="${build.hero.dname}"></div>`).css({ backgroundImage: `url(${this.getHeroImage(build.hero.key)})` });
+                    const itemsContainer = $(`<div class="items"></div>`);
+                    build.items.forEach(item => {
+                        const itemContainer = $(`<div class="item" title="${item.dname}"></div>`).css({ backgroundImage: `url(${this.getItemImage(item.key)})` });
+                        itemsContainer.append(itemContainer);
+                    })
+                    const buildContainer = $(`<div class="build"></div>`);
+                    $(buildContainer).append(heroContainer);
+                    $(buildContainer).append(itemsContainer);
+                    $(buildContainer).append(`<button class="remove">REMOVE</button>`);
+                    $("#build").append(buildContainer);
+                }
+
+                renderHeroes () {
+                    Object.keys(HeroAttribute).forEach(attrKey => {
+                        const heroesContainer = $(`<div id="${HeroAttribute[attrKey]}" class="heroes"></div>`).css({ width: `${100 / Object.keys(HeroAttribute).length}%` });
+                        const toggleButton = $(`<button class="toggle" id="${attrKey}">TOGGLE ${attrKey}</button>`)
+                        heroesContainer.append(toggleButton);
+                        this.heroes
+                            .filter(hero => hero.pa === HeroAttribute[attrKey])
+                            .forEach(hero => {
+                                heroesContainer.append($(`<div class="hero" id="${hero.key}" title="${hero.dname}"></div>`).css({ backgroundImage: `url(${this.getHeroImage(hero.key)})` }))
+                            });
+                        $("#container").append(heroesContainer);
+                    });
+                }
+            }
+
+            let picker = null;
+
+            $(document).ready(() => {
+                $.ajax({
+                    url: "http://www.dota2.com/jsfeed/heropediadata?feeds=itemdata,abilitydata,herodata",
+                    type: "GET",
+                    crossDomain: true,
+                    dataType: "jsonp",
+                    success: (data) => {
+                        $("#container").append(`<button class="generate">GENERATE BUILD</button><div id="build"></div>`);
+                        picker = new HeroPicker(
+                            Object.keys(data.herodata).map(key => ({
+                                ...data.herodata[key],
+                                key,
+                                isActive: true
+                            })),
+                            Object.keys(data.itemdata).map(key => ({
+                                ...data.itemdata[key],
+                                key
+                            }))
+                        );
+                        picker.renderHeroes();
+                    }
+                });
+            });
+
+            $(document)
+                .on("click", ".heroes .hero", function () {
+                    const heroname = $(this).attr("id");
+                    picker.toggleHero(heroname);
+                })
+                .on("click", ".toggle", function () {
+                    const attribute = $(this).attr("id");
+                    picker.toggleAttributeHeroes(attribute);
+                })
+                .on("click", ".generate", function () {
+                    const build = picker.generateBuild();
+                    picker.renderBuild(build);
+                })
+                .on("click", ".remove", function () {
+                    $(this).parent().remove();
+                });
+        </script>
+    </body>
+</html>
