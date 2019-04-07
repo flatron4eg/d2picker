@@ -152,9 +152,19 @@
                         return false;
                     }
                     if (!this.isSkillUlti(skillkey)) {
-                        return !((current === 1 && level < 3) || (current === 2 && level < 5) || (current === 3 && level < 7) || current === 4);
+                        const levelForUp = current * 2 + 1;
+                        let maxLevel = 4;
+                        if (skillkey.startsWith("invoker")) {
+                            maxLevel = 7;
+                        } 
+                        return !(level < levelForUp || current === maxLevel);
                     } else {
-                        return !((current === 0 && level < 6) || (current === 1 && level < 12) || (current === 2 && level < 18) || current === 3);
+                        let levelsForUlti = [6,12,18];
+                        const maxLevel = 3;
+                        if (skillkey.startsWith("meepo")) {
+                            levelsForUlti = [3,10,17];
+                        }
+                        return !(level < levelsForUlti[current] || current === maxLevel);
                     }
                 }
 
