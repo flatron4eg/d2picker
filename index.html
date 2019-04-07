@@ -77,6 +77,9 @@
                 }
 
                 getSkillImage (skillkey) {
+                    if (this.isSkillTalent(skillkey)) {
+                        return `img/${skillkey}.png`;
+                    }
                     return `http://cdn.dota2.com/apps/dota2/images/abilities/${skillkey}_hp1.png?v`;
                 }
 
@@ -132,14 +135,26 @@
                 }
 
                 getHeroSkills (heroname) {
-                    return this.abilities.filter(ability => ability.key.startsWith(heroname) || ability.key.startsWith(heroname.replace("_","")));
+                    const skills = this.abilities.filter(ability => ability.key.startsWith(heroname) || ability.key.startsWith(heroname.replace("_","")));
+                    const talents = [
+                        { dname: "Talent Left", key: "talent_left", hurl: heroname },
+                        { dname: "Talent Right", key: "talent_right", hurl: heroname }
+                    ];
+                    return [ ...talents, ...skills ];
                 }
 
                 isSkillUlti (skillkey) {
                     const skill = this.abilities.find(ability => ability.key === skillkey);
+                    if (!skill) {
+                        return false;
+                    }
                     const heroSkills = this.getHeroSkills(skill.hurl);
                     const skillIndex = heroSkills.findIndex(ability => ability.key === skill.key);
                     return skillIndex === (heroSkills.length - 1) && heroSkills.length > 3;
+                }
+
+                isSkillTalent (skillkey) {
+                    return skillkey.startsWith("talent");
                 }
 
                 canSkillBeLearned (skillkey, level, current) {
@@ -151,21 +166,26 @@
                     ].includes(skillkey)) {
                         return false;
                     }
-                    if (!this.isSkillUlti(skillkey)) {
-                        const levelForUp = current * 2 + 1;
-                        let maxLevel = 4;
-                        if (skillkey.startsWith("invoker")) {
-                            maxLevel = 7;
-                        } 
-                        return !(level < levelForUp || current === maxLevel);
-                    } else {
+                    let maxLevel;
+                    let levelForUp;
+                    if (this.isSkillUlti(skillkey)) {
                         let levelsForUlti = [6,12,18];
-                        const maxLevel = 3;
+                        maxLevel = 3;
                         if (skillkey.startsWith("meepo")) {
                             levelsForUlti = [3,10,17];
                         }
-                        return !(level < levelsForUlti[current] || current === maxLevel);
+                        levelForUp = levelsForUlti[current];
+                    } else if (this.isSkillTalent(skillkey)) {
+                        levelForUp = (current + 1) * 5 + 5;
+                        maxLevel = 4;
+                    } else {
+                        levelForUp = current * 2 + 1;
+                        maxLevel = 4;
+                        if (skillkey.startsWith("invoker")) {
+                            maxLevel = 7;
+                        } 
                     }
+                    return !(level < levelForUp || current === maxLevel);
                 }
 
                 getRandomNum (size) {
@@ -198,7 +218,13 @@
                     const build = [];
                     skills.forEach(skill => currentLevels[skill.key] = 0);
                     for (let level = 1; level <= 25; level++) {
-                        const skillsCanBeLearned = skills.filter(skill => this.canSkillBeLearned(skill.key, level, currentLevels[skill.key]));
+                        const skillsCanBeLearned = skills.filter(skill => {
+                            let current = currentLevels[skill.key];
+                            if (this.isSkillTalent(skill.key)) {
+                                current = currentLevels["talent_left"] + currentLevels["talent_right"];
+                            }
+                            return this.canSkillBeLearned(skill.key, level, current);
+                        });
                         if (skillsCanBeLearned.length) {
                             const skill = skillsCanBeLearned[this.getRandomNum(skillsCanBeLearned.length)];
                             const skillIndex = skills.findIndex(ability => ability.key === skill.key);
