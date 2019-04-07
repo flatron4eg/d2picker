@@ -63,12 +63,12 @@
                 }
 
                 getHeroImage (heroname) {
-                    return `https://cdn.dota2.com/apps/dota2/images/heroes/${heroname}_full.png`;
+                    return `http://cdn.dota2.com/apps/dota2/images/heroes/${heroname}_full.png?v`;
                 }
 
                 getItemImage (itemkey) {
                     const item = this.items.find(item => item.key === itemkey);
-                    return `https://cdn.dota2.com/apps/dota2/images/items/${item.img}`;
+                    return `http://cdn.dota2.com/apps/dota2/images/items/${item.img}`;
                 }
 
                 isItemBoots (itemkey) {
