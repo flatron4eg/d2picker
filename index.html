@@ -15,7 +15,11 @@
             .toggle, .generate, .remove {font-weight: bold; display:block; cursor: pointer; width:100%; margin:10px 0; background:#444; color:#fff; border:0; font-size:20px; padding:10px 12px; outline: none !important}
             .remove {float:right; width: auto;}
             .toggle:hover, .generate:hover {background:#555}
+            .build {margin: 40px 0}
             .build>* {vertical-align: middle}
+            .skills {display:block;}
+            .level {display:inline-block; text-align:center; margin:0 5px; font-weight: bold; font-size:20px; color:#fff; background:#222}
+            .skill {display:block; width:50px; height:50px; background-position: center center; background-color:#111; background-size: cover}
             #tip {padding: 40px; color:#777; text-align:center; font-weight: bold}
             #search {position: fixed; z-index: 3; bottom: 100px; text-shadow: 2px 2px 10px rgba(0,0,0,1); font-size: 48px; width:100%; text-align:center; left:0; display:none; color:#fff; font-weight: bold; text-transform: uppercase}
             #loader {text-align:center}
@@ -56,9 +60,10 @@
             });
 
             class HeroPicker {
-                constructor (heroes, items) {
+                constructor (heroes, items, abilities) {
                     this.heroes = heroes;
                     this.items = items;
+                    this.abilities = abilities;
                     this.searchString = "";
                 }
 
@@ -69,6 +74,10 @@
                 getItemImage (itemkey) {
                     const item = this.items.find(item => item.key === itemkey);
                     return `http://cdn.dota2.com/apps/dota2/images/items/${item.img}`;
+                }
+
+                getSkillImage (skillkey) {
+                    return `http://cdn.dota2.com/apps/dota2/images/abilities/${skillkey}_hp1.png?v`;
                 }
 
                 isItemBoots (itemkey) {
@@ -122,8 +131,20 @@
                     $(`.heroes .hero#${heroname}`).toggleClass("disabled");
                 }
 
-                canSkillBeLearned (skillkey, level, current) {
+                getHeroSkills (heroname) {
+                    return this.abilities.filter(ability => ability.key.startsWith(heroname) || ability.key.startsWith(heroname.replace("_","")));
+                }
 
+                canSkillBeLearned (skillkey, level, current) {
+                    const skill = this.abilities.find(ability => ability.key === skillkey);
+                    const heroSkills = this.getHeroSkills(skill.hurl);
+                    const skillIndex = heroSkills.findIndex(ability => ability.key === skill.key);
+                    const isUlti = skillIndex === (heroSkills.length - 1) && heroSkills.length > 3;
+                    if (!isUlti) {
+                        return !((current === 1 && level < 3) || (current === 2 && level < 5) || (current === 3 && level < 7) || current === 4);
+                    } else {
+                        return !((current === 0 && level < 6) || (current === 1 && level < 12) || (current === 2 && level < 18) || current === 3);
+                    }
                 }
 
                 getRandomNum (size) {
@@ -145,19 +166,55 @@
                         )
                         .shuffle()
                         .slice(0, 5);
-                    return { hero, items: [ boots, ...otherItems ] };
+                    const skills = this.generateSkillBuild(hero.key); 
+                    console.log(skills);
+                    return { hero, items: [ boots, ...otherItems ], skills };
+                }
+
+                generateSkillBuild (heroname) {
+                    const skills = this.getHeroSkills(heroname);
+                    const currentLevels = {};
+                    const build = [];
+                    skills.forEach(skill => currentLevels[skill.key] = 0);
+                    for (let level = 1; level <= 25; level++) {
+                        const skillsCanBeLearned = skills.filter(skill => this.canSkillBeLearned(skill.key, level, currentLevels[skill.key]));
+                        if (skillsCanBeLearned.length) {
+                            const skill = skillsCanBeLearned[this.getRandomNum(skillsCanBeLearned.length)];
+                            const skillIndex = skills.findIndex(ability => ability.key === skill.key);
+                            build.push(skillIndex);
+                            currentLevels[skill.key]++;
+                        } else {
+                            build.push(-1);
+                        }
+                    }
+                    return build;
                 }
 
                 renderBuild (build) {
                     const heroContainer = $(`<div class="hero" title="${build.hero.dname}"></div>`).css({ backgroundImage: `url(${this.getHeroImage(build.hero.key)})` });
                     const itemsContainer = $(`<div class="items"></div>`);
+                    const skillBuildContainer = $(`<div class="skills"></div>`);
                     build.items.forEach(item => {
                         const itemContainer = $(`<div class="item" title="${item.dname}"></div>`).css({ backgroundImage: `url(${this.getItemImage(item.key)})` });
                         itemsContainer.append(itemContainer);
                     })
+                    const heroSkills = this.getHeroSkills(build.hero.key);
+                    build.skills.forEach((skillIndex, level) => {
+                        const skill = heroSkills[skillIndex];
+                        const levelContainer = $(`<div class="level"><span>${level + 1}</span></div>`);
+                        let skillContainer;
+                        if (skill) {
+                            skillContainer = $(`<div class="skill" title="${skill.dname}"></div>`).css({ backgroundImage: `url(${this.getSkillImage(skill.key)})` });
+                        } else {
+                            skillContainer = $(`<div class="skill"></div>`);
+                        }
+                        levelContainer.append(skillContainer);
+                        skillBuildContainer.append(levelContainer);
+                    });
                     const buildContainer = $(`<div class="build"></div>`);
                     $(buildContainer).append(heroContainer);
                     $(buildContainer).append(itemsContainer);
+                    $(buildContainer).append(skillBuildContainer);
                     $(buildContainer).append(`<button class="remove">REMOVE</button>`);
                     $("#build").append(buildContainer);
                 }
@@ -198,6 +255,10 @@
                                 .sort((a, b) => a.dname.localeCompare(b.dname)),
                             Object.keys(data.itemdata).map(key => ({
                                 ...data.itemdata[key],
+                                key
+                            })),
+                            Object.keys(data.abilitydata).map(key => ({
+                                ...data.abilitydata[key],
                                 key
                             }))
                         );
