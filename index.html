@@ -17,7 +17,7 @@
             .toggle:hover, .generate:hover {background:#555}
             .build>* {vertical-align: middle}
             #tip {padding: 40px; color:#777; text-align:center; font-weight: bold}
-            #search {position: fixed; bottom: 100px; text-shadow: 2px 2px 5px rgba(0,0,0,0.3); font-size: 48px; width:100%; text-align:center; left:0; display:none; color:#fff; font-weight: bold; text-transform: uppercase}
+            #search {position: fixed; z-index: 3; bottom: 100px; text-shadow: 2px 2px 10px rgba(0,0,0,1); font-size: 48px; width:100%; text-align:center; left:0; display:none; color:#fff; font-weight: bold; text-transform: uppercase}
         </style>
         <script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
         <title>Dota 2 Random Hero Build Generator</title>
@@ -106,6 +106,10 @@
                     const hero = this.heroes.find(hero => hero.key === heroname);
                     hero.isActive = !hero.isActive;
                     $(`.heroes .hero#${heroname}`).toggleClass("disabled");
+                }
+
+                canSkillBeLearned (skillkey, level, current) {
+
                 }
 
                 getRandomNum (size) {
