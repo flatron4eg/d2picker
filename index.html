@@ -18,13 +18,27 @@
             .build>* {vertical-align: middle}
             #tip {padding: 40px; color:#777; text-align:center; font-weight: bold}
             #search {position: fixed; z-index: 3; bottom: 100px; text-shadow: 2px 2px 10px rgba(0,0,0,1); font-size: 48px; width:100%; text-align:center; left:0; display:none; color:#fff; font-weight: bold; text-transform: uppercase}
+            #loader {text-align:center}
+            .lds-ripple {display: inline-block;position: relative;width: 128px;height: 128px;}
+            .lds-ripple div {position: absolute;border: 4px solid #fff;opacity: 1;border-radius: 50%;animation: lds-ripple 1s cubic-bezier(0, 0.2, 0.8, 1) infinite;}
+            .lds-ripple div:nth-child(2) {animation-delay: -0.5s;}
+            @keyframes lds-ripple {
+                0% {top: 56px;left: 56px;width: 0;height: 0;opacity: 1;}
+                100% {top: -1px;left: -1px;width: 116px;height: 116px;opacity: 0;}
+            }
         </style>
         <script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
         <title>Dota 2 Random Hero Build Generator</title>
     </head>
     <body>
         <div id="tip">To search the hero, start typing hero's name</div>
-        <div id="container"></div>
+        <div id="container">
+            <div id="loader">
+                <div class="lds-ripple">
+                    <div></div><div></div>
+                </div>
+            </div>
+        </div>
         <div id="search"></div>
         <script>
             Array.prototype.shuffle = function () {
@@ -149,6 +163,7 @@
                 }
 
                 renderHeroes () {
+                    $("#container").html("");
                     Object.keys(HeroAttribute).forEach(attrKey => {
                         const heroesContainer = $(`<div id="${HeroAttribute[attrKey]}" class="heroes"></div>`).css({ width: `${100 / Object.keys(HeroAttribute).length}%` });
                         const toggleButton = $(`<button class="toggle" id="${attrKey}">TOGGLE ${attrKey}</button>`)
