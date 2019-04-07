@@ -212,10 +212,10 @@
                         skillBuildContainer.append(levelContainer);
                     });
                     const buildContainer = $(`<div class="build"></div>`);
+                    $(buildContainer).append(`<button class="remove">REMOVE</button>`);
                     $(buildContainer).append(heroContainer);
                     $(buildContainer).append(itemsContainer);
                     $(buildContainer).append(skillBuildContainer);
-                    $(buildContainer).append(`<button class="remove">REMOVE</button>`);
                     $("#build").append(buildContainer);
                 }
 
