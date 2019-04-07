@@ -135,12 +135,23 @@
                     return this.abilities.filter(ability => ability.key.startsWith(heroname) || ability.key.startsWith(heroname.replace("_","")));
                 }
 
-                canSkillBeLearned (skillkey, level, current) {
+                isSkillUlti (skillkey) {
                     const skill = this.abilities.find(ability => ability.key === skillkey);
                     const heroSkills = this.getHeroSkills(skill.hurl);
                     const skillIndex = heroSkills.findIndex(ability => ability.key === skill.key);
-                    const isUlti = skillIndex === (heroSkills.length - 1) && heroSkills.length > 3;
-                    if (!isUlti) {
+                    return skillIndex === (heroSkills.length - 1) && heroSkills.length > 3;
+                }
+
+                canSkillBeLearned (skillkey, level, current) {
+                    if ([
+                        "troll_warlord_whirling_axes_melee",
+                        "morphling_adaptive_strike_str",
+                        "morphling_morph_str",
+                        "dark_willow_bedlam"
+                    ].includes(skillkey)) {
+                        return false;
+                    }
+                    if (!this.isSkillUlti(skillkey)) {
                         return !((current === 1 && level < 3) || (current === 2 && level < 5) || (current === 3 && level < 7) || current === 4);
                     } else {
                         return !((current === 0 && level < 6) || (current === 1 && level < 12) || (current === 2 && level < 18) || current === 3);
@@ -259,7 +270,8 @@
                             })),
                             Object.keys(data.abilitydata).map(key => ({
                                 ...data.abilitydata[key],
-                                key
+                                key,
+                                hurl: data.abilitydata[key].hurl.toLowerCase()
                             }))
                         );
                         picker.renderHeroes();
