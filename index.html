@@ -174,11 +174,13 @@
                     success: (data) => {
                         $("#container").append(`<button class="generate">GENERATE BUILD</button><div id="build"></div>`);
                         picker = new HeroPicker(
-                            Object.keys(data.herodata).map(key => ({
-                                ...data.herodata[key],
-                                key,
-                                isActive: true
-                            })),
+                            Object.keys(data.herodata)
+                                .map(key => ({
+                                    ...data.herodata[key],
+                                    key,
+                                    isActive: true
+                                }))
+                                .sort((a, b) => a.dname.localeCompare(b.dname)),
                             Object.keys(data.itemdata).map(key => ({
                                 ...data.itemdata[key],
                                 key
