@@ -163,7 +163,6 @@
                 }
 
                 renderHeroes () {
-                    $("#container").html("");
                     Object.keys(HeroAttribute).forEach(attrKey => {
                         const heroesContainer = $(`<div id="${HeroAttribute[attrKey]}" class="heroes"></div>`).css({ width: `${100 / Object.keys(HeroAttribute).length}%` });
                         const toggleButton = $(`<button class="toggle" id="${attrKey}">TOGGLE ${attrKey}</button>`)
@@ -187,6 +186,7 @@
                     crossDomain: true,
                     dataType: "jsonp",
                     success: (data) => {
+                        $("#container").html("");
                         $("#container").append(`<button class="generate">GENERATE BUILD</button><div id="build"></div>`);
                         picker = new HeroPicker(
                             Object.keys(data.herodata)
