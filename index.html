@@ -204,6 +204,7 @@
                             !this.isItemBoots(item.key)
                             && item.cost >= 2000
                             && ["rare","epic","artifact"].includes(item.qual)
+                            && !["dagon","dagon_2","dagon_3","dagon_4"].includes(item.key)
                         )
                         .shuffle()
                         .slice(0, 5);
