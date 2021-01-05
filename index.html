@@ -411,7 +411,10 @@
                         const imageSrc = $(this).data("image");
                         $(this).addClass("loading");
                         $(`<img src="${imageSrc}">`).on("load", () => {
-                            $(this).css({ backgroundImage: `url(${imageSrc})` });
+                            $(this).animate({ opacity: 0 }, 200, function () {
+                                $(this).css({ backgroundImage: `url(${imageSrc})` });
+                                $(this).animate({ opacity: 1 }, 200);
+                            });
                             $(this).removeClass("loading");
                         });
                     });
