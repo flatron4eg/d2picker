@@ -134,7 +134,7 @@
                         "dagon_3",
                         "dagon_4"
                     ];
-                    this.itemImage = {
+                    this.fixedSkillImage = {
                         riki_backstab: "riki_permanent_invisibility"
                     };
                 }
@@ -152,7 +152,7 @@
                     if (this.isSkillTalent(skillkey)) {
                         return `img/${skillkey}.png`;
                     }
-                    const imageKey = this.itemImage[skillkey] || skillkey;
+                    const imageKey = this.fixedSkillImage[skillkey] || skillkey;
                     return `http://cdn.dota2.com/apps/dota2/images/abilities/${imageKey}_hp1.png?v`;
                 }
 
