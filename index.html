@@ -406,7 +406,7 @@
                 }).on("mousedown", "body", function (e) {
                     picker.updateSearch("clear");
                 });
-                $("body").on("DOMNodeInserted", ":has(.image)", function (e) {
+                $("body").on("DOMNodeInserted", "* .image", function (e) {
                     $(this).children(".image").each(function () {
                         const imageSrc = $(this).data("image");
                         $(this).addClass("loading");
