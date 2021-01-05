@@ -26,9 +26,14 @@
             .lds-ripple {display: inline-block;position: relative;width: 128px;height: 128px;}
             .lds-ripple div {position: absolute;border: 4px solid #fff;opacity: 1;border-radius: 50%;animation: lds-ripple 1s cubic-bezier(0, 0.2, 0.8, 1) infinite;}
             .lds-ripple div:nth-child(2) {animation-delay: -0.5s;}
+            .image.loading {animation: breath 1s infinite; background:#fff}
             @keyframes lds-ripple {
                 0% {top: 56px;left: 56px;width: 0;height: 0;opacity: 1;}
                 100% {top: -1px;left: -1px;width: 116px;height: 116px;opacity: 0;}
+            }
+            @keyframes breath {
+                0% {opacity:0.8}
+                100% {opacity:0.2}
             }
         </style>
         <script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
@@ -297,11 +302,11 @@
                 }
 
                 renderBuild (build) {
-                    const heroContainer = $(`<div class="hero" title="${build.hero.dname}"></div>`).css({ backgroundImage: `url(${this.getHeroImage(build.hero.key)})` });
+                    const heroContainer = $(`<div class="hero image" title="${build.hero.dname}"></div>`).data("image", this.getHeroImage(build.hero.key));
                     const itemsContainer = $(`<div class="items"></div>`);
                     const skillBuildContainer = $(`<div class="skills"></div>`);
                     build.items.forEach(item => {
-                        const itemContainer = $(`<div class="item" title="${item.dname}"></div>`).css({ backgroundImage: `url(${this.getItemImage(item.key)})` });
+                        const itemContainer = $(`<div class="item image" title="${item.dname}"></div>`).data("image", this.getItemImage(item.key));
                         itemsContainer.append(itemContainer);
                     })
                     const heroSkills = this.getHeroSkills(build.hero.key);
@@ -310,7 +315,7 @@
                         const levelContainer = $(`<div class="level"><span>${level + 1}</span></div>`);
                         let skillContainer;
                         if (skill) {
-                            skillContainer = $(`<div class="skill" title="${skill.dname}"></div>`).css({ backgroundImage: `url(${this.getSkillImage(skill.key)})` });
+                            skillContainer = $(`<div class="skill image" title="${skill.dname}"></div>`).data("image", this.getSkillImage(skill.key));
                         } else {
                             skillContainer = $(`<div class="skill"></div>`);
                         }
@@ -333,7 +338,7 @@
                         this.heroes
                             .filter(hero => hero.pa === HeroAttribute[attrKey])
                             .forEach(hero => {
-                                heroesContainer.append($(`<div class="hero" id="${hero.key}" title="${hero.dname}"></div>`).css({ backgroundImage: `url(${this.getHeroImage(hero.key)})` }))
+                                heroesContainer.append($(`<div class="hero image" id="${hero.key}" title="${hero.dname}"></div>`).data("image", this.getHeroImage(hero.key)));
                             });
                         $("#container").append(heroesContainer);
                     });
@@ -400,6 +405,16 @@
                     }
                 }).on("mousedown", "body", function (e) {
                     picker.updateSearch("clear");
+                });
+                $("body").on("DOMNodeInserted", ":has(.image)", function (e) {
+                    $(this).children(".image").each(function () {
+                        const imageSrc = $(this).data("image");
+                        $(this).addClass("loading");
+                        $(`<img src="${imageSrc}">`).on("load", () => {
+                            $(this).css({ backgroundImage: `url(${imageSrc})` });
+                            $(this).removeClass("loading");
+                        });
+                    });
                 });
         </script>
     </body>
