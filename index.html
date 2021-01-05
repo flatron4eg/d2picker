@@ -65,6 +65,68 @@
                     this.items = items;
                     this.abilities = abilities;
                     this.searchString = "";
+                    this.ignoredSkills = [
+                        // doubled skills
+                        "troll_warlord_whirling_axes_melee",
+                        "morphling_adaptive_strike_str",
+                        "morphling_morph_str",
+                        "dark_willow_bedlam",
+                        // aghanim scepter skills
+                        "clinkz_burning_army",
+                        "rattletrap_overclocking",
+                        "earth_spirit_petrify",
+                        "enchantress_bunny_hop",
+                        "grimstroke_dark_portrait",
+                        "kunkka_torrent_storm",
+                        "lycan_wolf_bite",
+                        "nyx_assassin_burrow",
+                        "ogre_magi_unrefined_fireblast",
+                        "snapfire_gobble_up",
+                        "spectre_haunt_single",
+                        "templar_assassin_trap_teleport",
+                        "shredder_chakram_2",
+                        "tiny_tree_channel",
+                        "treant_eyes_in_the_forest",
+                        "tusk_walrus_kick",
+                        "zuus_cloud",
+                        // aghanim shard skills
+                        "alchemist_berserk_potion",
+                        "bristleback_hairball",
+                        "broodmother_silken_bola",
+                        "rattletrap_jetpack",
+                        "dark_seer_normal_punch",
+                        "dragon_knight_fireball",
+                        "faceless_void_time_walk_reverse",
+                        "grimstroke_ink_over",
+                        "jakiro_liquid_ice",
+                        "kunkka_tidal_wave",
+                        "lich_ice_spire",
+                        "life_stealer_open_wounds",
+                        "magnataur_horn_toss",
+                        "medusa_cold_blooded",
+                        "necrolyte_death_seeker",
+                        "ogre_magi_smash",
+                        "omniknight_hammer_of_purity",
+                        "pangolier_rollup",
+                        "phantom_assassin_fan_of_knives",
+                        "pudge_eject",
+                        "riki_poison_dart",
+                        "slark_fish_bait",
+                        "sniper_concussive_grenade",
+                        "storm_spirit_electric_rave",
+                        "terrorblade_demon_zeal",
+                        "shredder_flamethrower",
+                        "tinker_defense_matrix",
+                        "tiny_craggy_exterior",
+                        "tusk_frozen_sigil",
+                        "witch_doctor_voodoo_switcheroo"
+                    ];
+                    this.ignoredItems = [
+                        "dagon",
+                        "dagon_2",
+                        "dagon_3",
+                        "dagon_4"
+                    ];
                 }
 
                 getHeroImage (heroname) {
@@ -158,12 +220,7 @@
                 }
 
                 canSkillBeLearned (skillkey, level, current) {
-                    if ([
-                        "troll_warlord_whirling_axes_melee",
-                        "morphling_adaptive_strike_str",
-                        "morphling_morph_str",
-                        "dark_willow_bedlam"
-                    ].includes(skillkey)) {
+                    if (this.ignoredSkills.includes(skillkey)) {
                         return false;
                     }
                     let maxLevel;
@@ -204,7 +261,7 @@
                             !this.isItemBoots(item.key)
                             && item.cost >= 2000
                             && ["rare","epic","artifact"].includes(item.qual)
-                            && !["dagon","dagon_2","dagon_3","dagon_4"].includes(item.key)
+                            && !this.ignoredItems.includes(item.key)
                         )
                         .shuffle()
                         .slice(0, 5);
