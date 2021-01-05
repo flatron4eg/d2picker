@@ -77,6 +77,7 @@
                         "morphling_adaptive_strike_str",
                         "morphling_morph_str",
                         "dark_willow_bedlam",
+                        "ember_spirit_activate_fire_remnant",
                         // aghanim scepter skills
                         "clinkz_burning_army",
                         "rattletrap_overclocking",
@@ -133,6 +134,9 @@
                         "dagon_3",
                         "dagon_4"
                     ];
+                    this.itemImage = {
+                        riki_backstab: "riki_permanent_invisibility"
+                    };
                 }
 
                 getHeroImage (heroname) {
@@ -148,7 +152,8 @@
                     if (this.isSkillTalent(skillkey)) {
                         return `img/${skillkey}.png`;
                     }
-                    return `http://cdn.dota2.com/apps/dota2/images/abilities/${skillkey}_hp1.png?v`;
+                    const imageKey = this.itemImage[skillkey] || skillkey;
+                    return `http://cdn.dota2.com/apps/dota2/images/abilities/${imageKey}_hp1.png?v`;
                 }
 
                 isItemBoots (itemkey) {
@@ -333,7 +338,7 @@
                 renderHeroes () {
                     Object.keys(HeroAttribute).forEach(attrKey => {
                         const heroesContainer = $(`<div id="${HeroAttribute[attrKey]}" class="heroes"></div>`).css({ width: `${100 / Object.keys(HeroAttribute).length}%` });
-                        const toggleButton = $(`<button class="toggle" id="${attrKey}">TOGGLE ${attrKey}</button>`)
+                        const toggleButton = $(`<button class="toggle" id="${attrKey}">TOGGLE ${attrKey}</button>`);
                         heroesContainer.append(toggleButton);
                         this.heroes
                             .filter(hero => hero.pa === HeroAttribute[attrKey])
