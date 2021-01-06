@@ -1,0 +1,45 @@
+* {font-family: Calibri}
+body {background:#333; }
+#container {width:80%;margin: 0 auto}
+.heroes {display:inline-block; vertical-align: top; box-sizing:border-box; padding:0 10px;}
+.hero, .item {display:inline-block; margin:5px; width:100px; height:50px; background-size: cover; background-position:center center; cursor: pointer; vertical-align: middle;}
+.item {width:85px; height:64px;}
+.items {display:inline-block; margin-left:100px}
+.hero:hover {filter: grayscale(50%);}
+.hero.disabled {filter: grayscale(100%);}
+.hero.found {position:relative; z-index:3; margin-left: -24px; margin-right:-14px; width:140px; height:90px; margin-bottom:-14px; margin-top:-24px;border:4px solid #ddd}
+.toggle, .generate, .remove {display:inline-block; text-transform:uppercase; box-sizing: border-box; text-align: center; font-weight: bold; cursor: pointer; margin:10px 0; background:#444; color:#fff; border:0; font-size:20px; padding:10px 12px; outline: none !important}
+.toggle.wide, .generate {width:100%}
+.remove {float:right; margin: 15px 0}
+.toggle:hover, .generate:hover, .remove:hover {background:#555}
+.generate {background:#555}
+.generate:hover {background:#666}
+.build {margin: 40px 0}
+.build>* {vertical-align: middle}
+.skills {display:block; margin-top: 10px}
+.level {display:inline-block; text-align:center; margin:0 5px; font-weight: bold; font-size:14px; color:#fff; background:#222}
+.level span {padding: 4px; display: inline-block}
+.skill {display:block; width:50px; height:50px; background-position: center center; background-color:#111; background-size: cover}
+#tip {padding: 40px; color:#777; text-align:center; font-weight: bold}
+#search {position: fixed; z-index: 3; bottom: 100px; text-shadow: 2px 2px 10px rgba(0,0,0,1); font-size: 48px; width:100%; text-align:center; left:0; display:none; color:#fff; font-weight: bold; text-transform: uppercase}
+#loader {text-align:center}
+.lds-ripple {display: inline-block;position: relative;width: 128px;height: 128px;}
+.lds-ripple div {position: absolute;border: 4px solid #fff;opacity: 1;border-radius: 50%;animation: lds-ripple 1s cubic-bezier(0, 0.2, 0.8, 1) infinite;}
+.lds-ripple div:nth-child(2) {animation-delay: -0.5s;}
+.image.loading {animation: breath 1s infinite; background:#fff}
+.toggle.str span {color: #bd7757}
+.toggle.agi span {color: #4bb84b}
+.toggle.int span {color: #68b8df}
+.search-overlay {display:none; position:fixed; left:0; top:0; background:rgba(0,0,0,0.7); z-index: 2; width: 100%; height: 100%;}
+.toggles {text-align: center}
+.toggles .toggle {margin-right: 10px}
+.toggles span {font-weight: bold; color:#fff; text-transform: uppercase; margin-right: 10px; font-size: 20px}
+.toggle#all {color:#df6868}
+@keyframes lds-ripple {
+    0% {top: 56px;left: 56px;width: 0;height: 0;opacity: 1;}
+    100% {top: -1px;left: -1px;width: 116px;height: 116px;opacity: 0;}
+}
+@keyframes breath {
+    0% {opacity:0.8}
+    100% {opacity:0.2}
+}
