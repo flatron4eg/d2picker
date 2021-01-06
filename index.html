@@ -161,12 +161,6 @@
                         "invoker_deafening_blast",
                         "invoker_invoke"
                     ];
-                    this.ignoredItems = [
-                        "dagon",
-                        "dagon_2",
-                        "dagon_3",
-                        "dagon_4"
-                    ];
                     this.fixedSkillImage = {
                         riki_backstab: "riki_permanent_invisibility"
                     };
@@ -306,15 +300,19 @@
                     const otherItems = this.items
                         .filter(item => 
                             !this.isItemBoots(item.key)
-                            && item.cost >= 2000
-                            && ["rare","epic","artifact"].includes(item.qual)
-                            && !this.ignoredItems.includes(item.key)
+                            && this.canItemBePurchased(item)
                         )
                         .shuffle()
                         .slice(0, 5);
                     const skills = this.generateSkillBuild(hero.key); 
                     console.log(skills);
                     return { hero, items: [ boots, ...otherItems ], skills };
+                }
+
+                canItemBePurchased (item) {
+                    return item.cost >= 2000
+                        && ["rare","epic","artifact"].includes(item.qual)
+                        && !this.items.some(someItem => someItem.components.includes(item.key));
                 }
 
                 generateSkillBuild (heroname) {
