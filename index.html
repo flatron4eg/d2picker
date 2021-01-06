@@ -607,7 +607,8 @@
                 $("body").on("DOMNodeInserted", ":has(.image)", function (e) {
                     $(this).find(".image").each(function () {
                         const imageSrc = $(this).data("image");
-                        if (imageSrc) {
+                        if (imageSrc && !$(this).hasClass("loading")) {
+                            console.log(imageSrc);
                             $(this).addClass("loading");
                             $(`<img src="${imageSrc}">`).on("load", () => {
                                 $(this).animate({ opacity: 0 }, 200, function () {
