@@ -65,10 +65,82 @@
                 INTELIGENCE: "int"
             });
 
+            /**
+             * @typedef {Object} Item
+             * @property {number} id
+             * @property {string} key
+             * @property {string} img
+             * @property {string} dname - Display name
+             * @property {"consumable" | "component" | "secret_shop" | "common" | "rare" | "epic" | "artifact"} qual
+             * @property {number} cost
+             * @property {string} desc
+             * @property {string} notes
+             * @property {string} attrib
+             * @property {boolean} mc
+             * @property {number} cd
+             * @property {string} lore
+             * @property {string[]} [components]
+             * @property {boolean} created
+             */
+
+            /**
+             * @typedef {Object} Hero
+             * @property {string} key
+             * @property {string} dname - Display name
+             * @property {string} u
+             * @property {"str" | "agi" | "int"} pa
+             * @property {Object} attribs
+             * @property {string} dac
+             * @property {string[]} droles
+             */
+
+            /**
+             * @typedef {Object} Ability
+             * @property {string} key
+             * @property {string} dname - Display name
+             * @property {string} affects
+             * @property {string} desc
+             * @property {string} notes
+             * @property {string} dmg
+             * @property {string} attrib
+             * @property {string} cmb
+             * @property {string} lore
+             * @property {string} hurl
+             */
+
+            /**
+             * @typedef {Object} HeroBuild
+             * @property {Hero} hero
+             * @property {Item[]} items
+             * @property {number[]} skills
+             */
+
+            /**
+             * @class
+             * @constructor
+             * @public
+             */
             class HeroPicker {
+                /**
+                 * @param {Hero[]} heroes
+                 * @param {Item[]} items
+                 * @param {Ability[]} abilities
+                 */
                 constructor (heroes, items, abilities) {
+                    /**
+                     * @type {Hero[]}
+                     * @private
+                     */
                     this.heroes = heroes;
+                    /**
+                     * @type {Item[]}
+                     * @private
+                     */
                     this.items = items;
+                    /**
+                     * @type {Ability[]}
+                     * @private
+                     */
                     this.abilities = abilities;
                     this.searchString = "";
                     this.heroUltiesUnique = {
@@ -166,15 +238,27 @@
                     };
                 }
 
+                /**
+                 * @param {string} heroname
+                 * @returns {string}
+                 */
                 getHeroImage (heroname) {
                     return `http://cdn.dota2.com/apps/dota2/images/heroes/${heroname}_full.png?v`;
                 }
 
+                /**
+                 * @param {string} itemkey
+                 * @returns {string}
+                 */
                 getItemImage (itemkey) {
                     const item = this.items.find(item => item.key === itemkey);
                     return `http://cdn.dota2.com/apps/dota2/images/items/${item.img}`;
                 }
 
+                /**
+                 * @param {string} skillkey
+                 * @returns {string}
+                 */
                 getSkillImage (skillkey) {
                     if (this.isSkillTalent(skillkey)) {
                         return `img/${skillkey}.png`;
@@ -183,6 +267,10 @@
                     return `http://cdn.dota2.com/apps/dota2/images/abilities/${imageKey}_hp1.png?v`;
                 }
 
+                /**
+                 * @param {string} itemkey
+                 * @returns {boolean}
+                 */
                 isItemBoots (itemkey) {
                     const item = this.items.find(item => item.key === itemkey);
                     return item
@@ -193,6 +281,11 @@
                         );
                 }
 
+                /**
+                 * @param {"add" | "remove" | "clear"} event
+                 * @param {string} data
+                 * @returns {void}
+                 */
                 updateSearch (event, data) {
                     switch (event) {
                         case "remove":
@@ -220,6 +313,10 @@
                     }
                 }
 
+                /**
+                 * @param {string} attribute
+                 * @returns {void}
+                 */
                 toggleAttributeHeroes (attribute) {
                     this.heroes
                         .filter(hero => hero.pa === HeroAttribute[attribute])
@@ -228,12 +325,20 @@
                         });
                 }
 
+                /**
+                 * @param {string} heroname
+                 * @returns {void}
+                 */
                 toggleHero (heroname) {
                     const hero = this.heroes.find(hero => hero.key === heroname);
                     hero.isActive = !hero.isActive;
                     $(`.heroes .hero#${heroname}`).toggleClass("disabled");
                 }
 
+                /**
+                 * @param {string} heroname
+                 * @returns {Ability[]}
+                 */
                 getHeroSkills (heroname) {
                     const skills = this.abilities.filter(ability => ability.key.startsWith(heroname) || ability.key.startsWith(heroname.replace("_","")));
                     const talents = [
@@ -243,6 +348,10 @@
                     return [ ...talents, ...skills ];
                 }
 
+                /**
+                 * @param {string} skillkey
+                 * @returns {boolean}
+                 */
                 isSkillUlti (skillkey) {
                     const skill = this.abilities.find(ability => ability.key === skillkey);
                     if (!skill) {
@@ -256,15 +365,31 @@
                     return skillIndex === (heroSkills.length - 1) && heroSkills.length > 5;
                 }
 
+                /**
+                 * @param {string} skillkey
+                 * @returns {boolean}
+                 */
                 isSkillTalent (skillkey) {
                     return skillkey.startsWith("talent");
                 }
 
+                /**
+                 * @param {string} skillkey
+                 * @param {number} level
+                 * @param {number} current
+                 * @returns {boolean}
+                 */
                 canSkillBeLearned (skillkey, level, current) {
                     if (this.ignoredSkills.includes(skillkey)) {
                         return false;
                     }
+                    /**
+                     * @type {number}
+                     */
                     let maxLevel;
+                    /**
+                     * @type {number}
+                     */
                     let levelForUp;
                     if (this.isSkillUlti(skillkey)) {
                         let levelsForUlti = [6,12,18];
@@ -286,10 +411,17 @@
                     return !(level < levelForUp || current === maxLevel);
                 }
 
+                /**
+                 * @param {number} size
+                 * @returns {number}
+                 */
                 getRandomNum (size) {
                     return Math.floor(Math.random() * size);
                 }
 
+                /**
+                 * @returns {HeroBuild}
+                 */
                 generateBuild () {
                     const activeHeroes = this.heroes.filter(hero => hero.isActive);
                     let randomNum = this.getRandomNum(activeHeroes.length);
@@ -297,6 +429,9 @@
                     const allBootsItems = this.items.filter(item => this.isItemBoots(item.key));
                     randomNum = this.getRandomNum(allBootsItems.length);
                     const boots = allBootsItems[randomNum];
+                    /**
+                     * @type {Item[]}
+                     */
                     const otherItems = this.items
                         .filter(item => 
                             !this.isItemBoots(item.key)
@@ -309,12 +444,20 @@
                     return { hero, items: [ boots, ...otherItems ], skills };
                 }
 
+                /**
+                 * @param {Item} item
+                 * @returns {boolean}
+                 */
                 canItemBePurchased (item) {
                     return item.cost >= 2000
                         && ["rare","epic","artifact"].includes(item.qual)
-                        && !this.items.some(someItem => someItem.components.includes(item.key));
+                        && !this.items.some(someItem => someItem.components && someItem.components.includes(item.key));
                 }
 
+                /**
+                 * @param {string} heroname
+                 * @returns {number[]}
+                 */
                 generateSkillBuild (heroname) {
                     const skills = this.getHeroSkills(heroname);
                     const currentLevels = {};
@@ -340,6 +483,10 @@
                     return build;
                 }
 
+                /**
+                 * @param {HeroBuild} build
+                 * @returns {void}
+                 */
                 renderBuild (build) {
                     const heroContainer = $(`<div class="hero image" title="${build.hero.dname}"></div>`).data("image", this.getHeroImage(build.hero.key));
                     const itemsContainer = $(`<div class="items"></div>`);
@@ -369,6 +516,9 @@
                     $("#build").append(buildContainer);
                 }
 
+                /**
+                 * @returns {void}
+                 */
                 renderHeroes () {
                     Object.keys(HeroAttribute).forEach(attrKey => {
                         const heroesContainer = $(`<div id="${HeroAttribute[attrKey]}" class="heroes"></div>`).css({ width: `${100 / Object.keys(HeroAttribute).length}%` });
@@ -384,6 +534,9 @@
                 }
             }
 
+            /**
+             * @type {HeroPicker}
+             */
             let picker = null;
 
             $(document).ready(() => {
