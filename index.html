@@ -71,6 +71,9 @@
                     this.items = items;
                     this.abilities = abilities;
                     this.searchString = "";
+                    this.heroUltiesUnique = {
+                        keeper_of_the_light: "keeper_of_the_light_will_o_wisp"
+                    };
                     this.ignoredSkills = [
                         // doubled skills
                         "troll_warlord_whirling_axes_melee",
@@ -152,6 +155,7 @@
                         "invoker_forge_spirit",
                         "invoker_ice_wall",
                         "invoker_deafening_blast",
+                        "invoker_invoke"
                     ];
                     this.ignoredItems = [
                         "dagon",
@@ -245,6 +249,9 @@
                     const skill = this.abilities.find(ability => ability.key === skillkey);
                     if (!skill) {
                         return false;
+                    }
+                    if (this.heroUltiesUnique[skill.hurl]) {
+                        return skillkey === this.heroUltiesUnique[skill.hurl];
                     }
                     const heroSkills = this.getHeroSkills(skill.hurl);
                     const skillIndex = heroSkills.findIndex(ability => ability.key === skill.key);
