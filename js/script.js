@@ -104,7 +104,8 @@ class HeroPicker {
         this.abilities = abilities;
         this.searchString = "";
         this.heroUltiesUnique = {
-            keeper_of_the_light: "keeper_of_the_light_will_o_wisp"
+            keeper_of_the_light: "keeper_of_the_light_will_o_wisp",
+            tiny: "tiny_grow"
         };
         this.ignoredSkills = [
             // doubled skills
