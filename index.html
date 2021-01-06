@@ -65,6 +65,18 @@
                 INTELIGENCE: "int"
             });
 
+            async function loadData () {
+                return new Promise((resolve, reject) => {
+                    $.ajax({
+                        url: "https://www.dota2.com/jsfeed/heropediadata?feeds=itemdata,abilitydata,herodata",
+                        type: "GET",
+                        crossDomain: true,
+                        dataType: "jsonp",
+                        success: data => resolve(data)
+                    });
+                });
+            }
+
             /**
              * @typedef {Object} Item
              * @property {number} id
@@ -539,36 +551,29 @@
              */
             let picker = null;
 
-            $(document).ready(() => {
-                $.ajax({
-                    url: "https://www.dota2.com/jsfeed/heropediadata?feeds=itemdata,abilitydata,herodata",
-                    type: "GET",
-                    crossDomain: true,
-                    dataType: "jsonp",
-                    success: (data) => {
-                        $("#container").html("");
-                        $("#container").append(`<button class="generate">GENERATE BUILD</button><div id="build"></div>`);
-                        picker = new HeroPicker(
-                            Object.keys(data.herodata)
-                                .map(key => ({
-                                    ...data.herodata[key],
-                                    key,
-                                    isActive: true
-                                }))
-                                .sort((a, b) => a.dname.localeCompare(b.dname)),
-                            Object.keys(data.itemdata).map(key => ({
-                                ...data.itemdata[key],
-                                key
-                            })),
-                            Object.keys(data.abilitydata).map(key => ({
-                                ...data.abilitydata[key],
-                                key,
-                                hurl: data.abilitydata[key].hurl.toLowerCase()
-                            }))
-                        );
-                        picker.renderHeroes();
-                    }
-                });
+            $(document).ready(async () => {
+                const data = await loadData(); 
+                $("#container").html("");
+                $("#container").append(`<button class="generate">GENERATE BUILD</button><div id="build"></div>`);
+                picker = new HeroPicker(
+                    Object.keys(data.herodata)
+                        .map(key => ({
+                            ...data.herodata[key],
+                            key,
+                            isActive: true
+                        }))
+                        .sort((a, b) => a.dname.localeCompare(b.dname)),
+                    Object.keys(data.itemdata).map(key => ({
+                        ...data.itemdata[key],
+                        key
+                    })),
+                    Object.keys(data.abilitydata).map(key => ({
+                        ...data.abilitydata[key],
+                        key,
+                        hurl: data.abilitydata[key].hurl.toLowerCase()
+                    }))
+                );
+                picker.renderHeroes();
             });
 
             $(document)
