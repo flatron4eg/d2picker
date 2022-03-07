@@ -1,3 +1,5 @@
+/* eslint-disable no-unused-vars */
+/* eslint-env jquery */
 Array.prototype.shuffle = function () {
     for (let i = this.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
@@ -7,72 +9,185 @@ Array.prototype.shuffle = function () {
 };
 
 const HeroAttribute = Object.freeze({
-    STRENGTH: "str",
-    AGILITY: "agi",
-    INTELIGENCE: "int"
+    STRENGTH: 0,
+    AGILITY: 1,
+    INTELIGENCE: 2
 });
 
-async function loadData () {
-    return new Promise((resolve, reject) => {
+/**
+ * @typedef {object} HeroShortData
+ * @property {number} id
+ * @property {string} name
+ * @property {string} name_loc
+ * @property {string} name_english_loc
+ * @property {number} primary_attr
+ * @property {number} complexity
+ */
+
+/**
+ * @typedef {object} HeroValue 
+ * @property {number[]} bonuses
+ * @property {string} heading_loc
+ * @property {boolean} is_percentage
+ * @property {string} name
+ * @property {number[]} values_float
+ */
+
+/**
+ * @typedef {object} HeroAbility
+ * @property {boolean} ability_has_scepter
+ * @property {boolean} ability_has_shard
+ * @property {boolean} ability_is_granted_by_scepter
+ * @property {boolean} ability_is_granted_by_shard
+ * @property {string} behavior
+ * @property {number[]} cast_points
+ * @property {number[]} cast_ranges
+ * @property {number[]} channel_times
+ * @property {number[]} cooldowns
+ * @property {number} damage
+ * @property {number[]} damages
+ * @property {string} desc_loc
+ * @property {number} dispellable
+ * @property {number[]} durations
+ * @property {number} flags
+ * @property {number[]} gold_costs
+ * @property {number} id
+ * @property {number} immunity
+ * @property {boolean} is_item
+ * @property {number} item_cost
+ * @property {number} item_initial_charges
+ * @property {number} item_neutral_tier
+ * @property {number} item_quality
+ * @property {number} item_stock_max
+ * @property {number} item_stock_time
+ * @property {string} lore_loc
+ * @property {number[]} mana_costs
+ * @property {number} max_level
+ * @property {string} name
+ * @property {string} name_loc
+ * @property {string[]} notes_loc
+ * @property {string} scepter_loc
+ * @property {string} shard_loc
+ * @property {HeroValue[]} special_values
+ * @property {number} target_team
+ * @property {number} target_type
+ * @property {number} type
+ */
+
+/**
+ * @typedef {object} HeroData
+ * @property {HeroAbility[]} abilities
+ * @property {number} agi_base
+ * @property {number} agi_gain
+ * @property {number} armor
+ * @property {number} attack_capability
+ * @property {number} attack_range
+ * @property {number} attack_rate
+ * @property {string} bio_loc
+ * @property {number} complexity
+ * @property {number} damage_max
+ * @property {number} damage_min
+ * @property {number} health_regen
+ * @property {string} hype_loc
+ * @property {number} id
+ * @property {number} int_base
+ * @property {number} int_gain
+ * @property {number} magic_resistance
+ * @property {number} mana_regen
+ * @property {number} max_health
+ * @property {number} max_mana
+ * @property {number} movement_speed
+ * @property {string} name
+ * @property {string} name_loc
+ * @property {string} npe_desc_loc
+ * @property {number} order_id
+ * @property {number} primary_attr
+ * @property {number} projectile_speed
+ * @property {number[]} role_levels
+ * @property {number} sight_range_day
+ * @property {number} sight_range_noght
+ * @property {number} str_base
+ * @property {number} str_gain
+ * @property {HeroAbility[]} talents
+ * @property {number} turn_rate
+ */
+
+/**
+ * @typedef {object} ItemShortData
+ * @property {number} id
+ * @property {string} name
+ * @property {string} name_english_loc
+ * @property {string} name_loc
+ * @property {number} neutral_item_tier
+ */
+
+/**
+ * @returns {Promise<HeroShortData[]>}
+ */
+async function loadHeroes () {
+    return new Promise((resolve, _reject) => {
         $.ajax({
-            url: "https://www.dota2.com/jsfeed/heropediadata?feeds=itemdata,abilitydata,herodata",
+            url: "https://www.dota2.com/datafeed/herolist?language=english",
             type: "GET",
             crossDomain: true,
             dataType: "jsonp",
-            success: data => resolve(data)
+            success: data => resolve(data.result.data.heroes)
         });
     });
 }
 
 /**
- * @typedef {Object} Item
- * @property {number} id
- * @property {string} key
- * @property {string} img
- * @property {string} dname - Display name
- * @property {"consumable" | "component" | "secret_shop" | "common" | "rare" | "epic" | "artifact"} qual
- * @property {number} cost
- * @property {string} desc
- * @property {string} notes
- * @property {string} attrib
- * @property {boolean} mc
- * @property {number} cd
- * @property {string} lore
- * @property {string[]} [components]
- * @property {boolean} created
+ * @param {number} id
+ * @returns {Promise<HeroData>} 
  */
+async function loadHero (id) {
+    return new Promise((resolve, _reject) => {
+        $.ajax({
+            url: `https://www.dota2.com/datafeed/herodata?language=english&hero_id=${id}`,
+            type: "GET",
+            crossDomain: true,
+            dataType: "jsonp",
+            success: data => resolve(data.result.data.heroes[0])
+        });
+    });
+}
 
 /**
- * @typedef {Object} Hero
- * @property {string} key
- * @property {string} dname - Display name
- * @property {string} u
- * @property {"str" | "agi" | "int"} pa
- * @property {Object} attribs
- * @property {string} dac
- * @property {string} droles
- * @property {boolean} isActive
+ * @returns {Promise<ItemShortData[]>}
  */
+ async function loadItems () {
+    return new Promise((resolve, _reject) => {
+        $.ajax({
+            url: `https://www.dota2.com/datafeed/itemlist?language=english`,
+            type: "GET",
+            crossDomain: true,
+            dataType: "jsonp",
+            success: data => resolve(data.result.data.itemabilities)
+        });
+    });   
+}
 
 /**
- * @typedef {Object} Ability
- * @property {string} key
- * @property {string} dname - Display name
- * @property {string} affects
- * @property {string} desc
- * @property {string} notes
- * @property {string} dmg
- * @property {string} attrib
- * @property {string} cmb
- * @property {string} lore
- * @property {string} hurl
+ * @param {number} id
+ * @returns {Promise<HeroAbility>}
  */
+async function loadItem (id) {
+    return new Promise((resolve, _reject) => {
+        $.ajax({
+            url: `https://www.dota2.com/datafeed/itemdata?language=english&item_id=${id}`,
+            type: "GET",
+            crossDomain: true,
+            dataType: "jsonp",
+            success: data => resolve(data.result.data.items[0])
+        });
+    });   
+}
 
 /**
  * @typedef {Object} HeroBuild
- * @property {Hero} hero
- * @property {Item[]} items
- * @property {number[]} skills
+ * @property {HeroData} hero
+ * @property {HeroAbility[]} items
+ * @property {HeroAbility[]} skills
  */
 
 /**
@@ -82,150 +197,56 @@ async function loadData () {
  */
 class HeroPicker {
     /**
-     * @param {Hero[]} heroes
-     * @param {Item[]} items
-     * @param {Ability[]} abilities
+     * @param {HeroShortData[]} heroes
+     * @param {ItemShortData[]} items
      */
-    constructor (heroes, items, abilities) {
+    constructor (heroes, items) {
         /**
-         * @type {Hero[]}
+         * @type {Map<number, HeroShortData>}
          * @private
          */
-        this.heroes = heroes;
+        this.heroes = new Map();
+        heroes.forEach(hero => this.heroes.set(hero.id, hero));
         /**
-         * @type {Item[]}
+         * @type {Map<number, ItemShortData>}
          * @private
          */
-        this.items = items;
-        /**
-         * @type {Ability[]}
-         * @private
-         */
-        this.abilities = abilities;
+        this.items = new Map();
+        items.forEach(item => this.items.set(item.id, item));
         this.searchString = "";
-        this.heroUltiesUnique = {
-            keeper_of_the_light: "keeper_of_the_light_will_o_wisp",
-            tiny: "tiny_grow"
-        };
-        this.ignoredSkills = [
-            // doubled skills
-            "troll_warlord_whirling_axes_melee",
-            "morphling_adaptive_strike_str",
-            "morphling_morph_str",
-            "dark_willow_bedlam",
-            "ember_spirit_activate_fire_remnant",
-            "wisp_spirits_in",
-            "wisp_spirits_out",
-            "techies_focused_detonate",
-            "treant_eyes_in_the_forest",
-            "keeper_of_the_light_blinding_light",
-            "keeper_of_the_light_spirit_form",
-            "keeper_of_the_light_spirit_form_illuminate",
-            "keeper_of_the_light_recall",
-            "earth_spirit_stone_caller",
-            "tiny_toss_tree",
-            "treant_natures_guise",
-            // aghanim scepter skills
-            "clinkz_burning_army",
-            "rattletrap_overclocking",
-            "earth_spirit_petrify",
-            "enchantress_bunny_hop",
-            "grimstroke_dark_portrait",
-            "kunkka_torrent_storm",
-            "lycan_wolf_bite",
-            "nyx_assassin_burrow",
-            "ogre_magi_unrefined_fireblast",
-            "snapfire_gobble_up",
-            "spectre_haunt_single",
-            "templar_assassin_trap_teleport",
-            "shredder_chakram_2",
-            "tiny_tree_channel",
-            "treant_eyes_in_the_forest",
-            "tusk_walrus_kick",
-            "zuus_cloud",
-            "meepo_petrify",
-            "techies_minefield_sign",
-            "leshrac_greater_lightning_storm",
-            "antimage_mana_overload",
-            // aghanim shard skills
-            "alchemist_berserk_potion",
-            "bristleback_hairball",
-            "broodmother_silken_bola",
-            "rattletrap_jetpack",
-            "dark_seer_normal_punch",
-            "dragon_knight_fireball",
-            "faceless_void_time_walk_reverse",
-            "grimstroke_ink_over",
-            "jakiro_liquid_ice",
-            "kunkka_tidal_wave",
-            "lich_ice_spire",
-            "life_stealer_open_wounds",
-            "magnataur_horn_toss",
-            "medusa_cold_blooded",
-            "necrolyte_death_seeker",
-            "ogre_magi_smash",
-            "omniknight_hammer_of_purity",
-            "pangolier_rollup",
-            "phantom_assassin_fan_of_knives",
-            "pudge_eject",
-            "riki_poison_dart",
-            "slark_fish_bait",
-            "sniper_concussive_grenade",
-            "storm_spirit_electric_rave",
-            "terrorblade_demon_zeal",
-            "shredder_flamethrower",
-            "tinker_defense_matrix",
-            "tiny_craggy_exterior",
-            "tusk_frozen_sigil",
-            "witch_doctor_voodoo_switcheroo",
-            // ???
-            "beastmaster_mark_of_the_beast",
-            "zuus_heavenly_jump",
-            // invoker spells
-            "invoker_cold_snap",
-            "invoker_ghost_walk",
-            "invoker_tornado",
-            "invoker_emp",
-            "invoker_alacrity",
-            "invoker_chaos_meteor",
-            "invoker_sun_strike",
-            "invoker_forge_spirit",
-            "invoker_ice_wall",
-            "invoker_deafening_blast",
-            "invoker_invoke"
-        ];
-        this.fixedSkillImage = {
-            riki_backstab: "riki_permanent_invisibility"
-        };
     }
 
     /**
-     * @param {string} heroname
+     * @param {number} id
      * @returns {string}
      */
-    getHeroImage (heroname) {
-        return `http://cdn.dota2.com/apps/dota2/images/heroes/${heroname}_full.png?v`;
+    getHeroImage (id) {
+        const hero = this.heroes.get(id);
+        const nameParts = hero.name.split("_");
+        const heroName = nameParts[nameParts.length - 1];
+        return `https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/heroes/${heroName}.png`;
     }
 
     /**
-     * @param {string} itemkey
+     * @param {number} id
      * @returns {string}
      */
-    getItemImage (itemkey) {
-        const item = this.items.find(item => item.key === itemkey);
-        return `http://cdn.dota2.com/apps/dota2/images/items/${item.img}`;
+    getItemImage (id) {
+        const item = this.items.get(id);
+        const itemName = item.name.substring(item.name.indexOf("_") + 1);
+        return `https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/items/${itemName}.png`;
     }
 
     /**
-     * @param {string} skillkey
+     * @param {number} id
      * @returns {string}
      */
-    getSkillImage (skillkey) {
+    getSkillImage (heroId, id) {
         if (this.isSkillTalent(skillkey)) {
             return `img/${skillkey}.png`;
         }
         const imageKey = this.fixedSkillImage[skillkey] || skillkey;
-        return `http://cdn.dota2.com/apps/dota2/images/abilities/${imageKey}_hp1.png?v`;
+        return `https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/abilities/${abilityName}.png`;
     }
 
     /**
@@ -270,10 +291,10 @@ class HeroPicker {
             $(this).removeClass("found");
         });
         if (this.searchString.length) {
-            this.heroes
-                .filter(hero => hero.dname.toLowerCase().includes(this.searchString))
+            Array.from(this.heroes.values())
+                .filter(hero => hero.name_english_loc.toLowerCase().includes(this.searchString))
                 .forEach(hero => {
-                    $(`.heroes .hero#${hero.key}`).addClass("found");
+                    $(`.heroes .hero#${hero.id}`).addClass("found");
                 });
             $(".search-overlay").show();
         } else {
@@ -286,10 +307,10 @@ class HeroPicker {
      * @returns {void}
      */
     toggleAttributeHeroes (attribute) {
-        this.heroes
-            .filter(hero => hero.pa === HeroAttribute[attribute])
+        Array.from(this.heroes.values())
+            .filter(hero => hero.primary_attr === HeroAttribute[attribute])
             .forEach(hero => {
-                this.toggleHero(hero.key);
+                this.toggleHero(hero.id);
             });
     }
 
@@ -319,20 +340,20 @@ class HeroPicker {
     }
 
     /**
-     * @param {string} heroname
+     * @param {number} id
      * @returns {void}
      */
-    toggleHero (heroname) {
-        const hero = this.heroes.find(hero => hero.key === heroname);
+    toggleHero (id) {
+        const hero = this.heroes.get(id);
         hero.isActive = !hero.isActive;
-        $(`.heroes .hero#${heroname}`).toggleClass("disabled");
+        $(`.heroes .hero#${id}`).toggleClass("disabled");
     }
 
     /**
-     * @param {string} heroname
+     * @param {number} id
      * @returns {Ability[]}
      */
-    getHeroSkills (heroname) {
+    getHeroSkills (id) {
         const skills = this.abilities.filter(ability => ability.key.startsWith(heroname) || ability.key.startsWith(heroname.replace("_","")));
         const talents = [
             { dname: "Talent Left", key: "talent_left", hurl: heroname },
@@ -480,9 +501,7 @@ class HeroPicker {
      * @returns {string[]}
      */
     getAllRoles () {
-        const roles = this.heroes.map(hero => hero.droles.split(" - ")).flat();
-        console.log(roles);
-        return [...new Set(roles)];
+        return ["Основа","Поддержка","Быстрый урон","Контроль","Лес","Стойкость","Побег","Осада","Инициация"];
     }
 
     /**
@@ -525,7 +544,7 @@ class HeroPicker {
         const togglesContainer = $(`<div class="toggles"></div>`);
         const toggleButtons = [
             $(`<div class="toggle" id="all">ALL</div>`),
-            ...this.getAllRoles().map(role => $(`<div class="toggle role" id="${role}">${role}</div>`))
+            ...this.getAllRoles().map((role, index) => $(`<div class="toggle role" id="${index}">${role}</div>`))
         ];
         const togglesHeader = $(`<span>Toggle</span>`);
         togglesContainer.append([togglesHeader, ...toggleButtons]);
@@ -535,10 +554,10 @@ class HeroPicker {
             const heroesContainer = $(`<div id="${HeroAttribute[attrKey]}" class="heroes"></div>`).css({ width: `${100 / Object.keys(HeroAttribute).length}%` });
             const toggleButton = $(`<div class="toggle wide attr ${HeroAttribute[attrKey]}" id="${attrKey}">TOGGLE <span>${attrKey}</span></div>`);
             heroesContainer.append(toggleButton);
-            this.heroes
-                .filter(hero => hero.pa === HeroAttribute[attrKey])
+            Array.from(this.heroes.values())
+                .filter(hero => hero.primary_attr === HeroAttribute[attrKey])
                 .forEach(hero => {
-                    heroesContainer.append($(`<div class="hero image" id="${hero.key}" title="${hero.dname}"></div>`).data("image", this.getHeroImage(hero.key)));
+                    heroesContainer.append($(`<div class="hero image" id="${hero.id}" title="${hero.name_english_loc}"></div>`).data("image", this.getHeroImage(hero.id)));
                 });
             $("#container").append(heroesContainer);
         });
@@ -551,27 +570,13 @@ class HeroPicker {
 let picker = null;
 
 $(document).ready(async () => {
-    const data = await loadData(); 
+    const [heroes, items] = await Promise.all([
+        loadHeroes(),
+        loadItems()
+    ]);
     $("#container").html("");
     $("#container").append(`<button class="generate">GENERATE BUILD</button><div id="build"></div>`);
-    picker = new HeroPicker(
-        Object.keys(data.herodata)
-            .map(key => ({
-                ...data.herodata[key],
-                key,
-                isActive: true
-            }))
-            .sort((a, b) => a.dname.localeCompare(b.dname)),
-        Object.keys(data.itemdata).map(key => ({
-            ...data.itemdata[key],
-            key
-        })),
-        Object.keys(data.abilitydata).map(key => ({
-            ...data.abilitydata[key],
-            key,
-            hurl: data.abilitydata[key].hurl.toLowerCase()
-        }))
-    );
+    picker = new HeroPicker(heroes, items);
     picker.renderHeroes();
 });
 
